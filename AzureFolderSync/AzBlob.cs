@@ -1,7 +1,6 @@
 ﻿using System;
 
 using System.Collections.Generic;
-using Microsoft.Azure; // Namespace for CloudConfigurationManager
 using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount
 using Microsoft.WindowsAzure.Storage.Blob; // Namespace for Blob storage types
 using System.IO;
@@ -21,13 +20,14 @@ public class AzBlob
     public static string accountName = "";
     public static string syncDir = "";
 
+
    
     public AzBlob()
     {
 
     }
 
-    public CloudBlobContainer InitBlob(string accountName, string accountKey, string blobName)
+    public static CloudBlobContainer InitBlob(string accountName, string accountKey, string blobName)
     {
         string connectionString = "DefaultEndpointsProtocol=https;AccountName=" + accountName + ";AccountKey=" + accountKey;
 
@@ -137,8 +137,8 @@ public class AzBlob
     // Insert logic for processing found files here.
     public static void ProcessFile(string path, string targetDirectory)
     {
-        AzBlob blobReader = new AzBlob();
-        CloudBlobContainer container = blobReader.InitBlob(accountName, blobKey, blobName);
+        
+        CloudBlobContainer container = AzBlob.InitBlob(accountName, blobKey, blobName);
 
         UploadFileToBlob(container, path, MakePathToBlob(path, syncDir));
 

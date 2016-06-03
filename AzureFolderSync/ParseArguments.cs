@@ -24,7 +24,7 @@ namespace AzureFolderSync
 
                     for (int paramNumber = 0; paramNumber < basedParams.Length; paramNumber++)
                     {
-                        if (args[argNumber] == basedParams[paramNumber].paramKey)
+                        if (args[argNumber].ToLower() == basedParams[paramNumber].paramKey)
                         {
                             // Boolean parameter
                             if (basedParams[paramNumber].isBool == true)
