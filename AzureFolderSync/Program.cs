@@ -39,7 +39,7 @@ namespace AzureFolderSync
                 ShowHelp(newArguments);
             }
 
-          
+            
             Console.ReadLine();
         }
 
