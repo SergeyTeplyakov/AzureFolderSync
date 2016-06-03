@@ -40,7 +40,7 @@ namespace AzureFolderSync
             }
 
             
-            Console.ReadLine();
+            Console.ReadLine();  //Wait
         }
 
         static void ShowHelp(Arguments[] arguments)
