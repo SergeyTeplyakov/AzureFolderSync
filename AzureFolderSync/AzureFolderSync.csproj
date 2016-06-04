@@ -78,6 +78,8 @@
   <ItemGroup>
     <Compile Include="Arguments.cs" />
     <Compile Include="AzBlob.cs" />
+    <Compile Include="FolderSyncConfiguration.cs" />
+    <Compile Include="FolderSynchronizer.cs" />
     <Compile Include="Params.cs" />
     <Compile Include="ParseArguments.cs" />
     <Compile Include="Program.cs" />
