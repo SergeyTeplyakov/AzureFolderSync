@@ -3,8 +3,6 @@
 //Parameters of the program
 public  class Params
 {
-
-
     public static string accountName = "";
     public static string accountKey = "";
     public static string blobName = "";

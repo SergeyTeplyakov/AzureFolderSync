@@ -15,6 +15,9 @@ namespace AzureFolderSync
         public string paramValue;
         public bool boolValue;
 
+        // TODO: нужно вынести configuration manager из аргументов.
+        // склеивать аргументы нужны на другом уровне
+        // примерно так:
         public static Arguments[] InitArguments()
         {
             Arguments[] newArguments = new Arguments[5];

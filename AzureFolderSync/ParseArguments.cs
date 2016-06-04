@@ -1,10 +1,170 @@
 ﻿using System;
+using System.Collections.Generic;
 
+/* Ключевые классы программы:
+ * 
+ * 1. Бизнес-логика: 
+ *   - FolderSyncConfiguration
+ *   - FolderSynchronizer
+ *   Они используют AzureBlob, но никто знать об этом не должен
+ *   - SyncException
+ *     Именно это исключение должно пробрасываться FolderSynchronizer-ом наверх (потроха должны скрываться),
+ *     Вызывающий код должен его перехватывать в методе TrySync и выводить его на экран, возможно, спрашивая
+ *     что-то у пользователя, типа, а нужно ли ретраиться.
+ * 2. Аргументы и их парсинг
+ *  - Argument - класс, который хранит значение аргумента. Поменять значение извне конструктора не должно быть возможно
+ *    поскольку это приведет к расползанию обязанностей
+ *  - ArgumentProcessor - центральны класс, который отвечает за обработку и создание валидных аргументов
+ *    из командной строки.
+ *    Пока что именно он может знать о списке возможных аргументов (ключей) и валидировать их.
+ *
+ */
 
 namespace AzureFolderSync
 {
-    public class ParseArguments
+    public class FolderSyncConfiguration
+    {
+        public FolderSyncConfiguration(string accountName, string accountKey, string blobName, string inputDir)
+        {
+            // Эти исключения никогда не обрабатываются!!!
+            if (string.IsNullOrEmpty(accountName)) throw new ArgumentNullException(nameof(accountName));
+            if (string.IsNullOrEmpty(accountKey)) throw new ArgumentNullException(nameof(accountKey));
+            if (string.IsNullOrEmpty(blobName)) throw new ArgumentNullException(nameof(blobName));
+            if (string.IsNullOrEmpty(inputDir)) throw new ArgumentNullException(nameof(inputDir));
 
+            AccountName = accountName;
+            AccountKey = accountKey;
+            BlobName = blobName;
+            InputDir = inputDir;
+        }
+
+        public string AccountName { get; }
+        public string AccountKey { get; }
+        public string BlobName { get; }
+        public TimeSpan Timeout { get; }
+        public int RetryCount { get; }
+        public string InputDir { get; }
+    }
+
+    class SampleToShowTheDesign
+    {
+        public static void Main(string[] args)
+        {
+            // 1. Parse provided arguments, print help if they're invalid
+            // List<Argument> parsedArguments;
+            // if (!ParseArgumentsAndPrintHelpIfInvalid(args, out parsedArguments) {
+            // {
+            //     Пусть принтит сообщение сам метод ParseArguments! В противном случае, нужно будет
+            //     протаскивать сюда строку, ведь мы не всегда знаем, что именно нам нужно вывести на экран
+            //     в следующих случаях!
+            //     return;
+            // }
+            //
+            // if (!MergeWitDefaultArguments(parsedArguments)) {
+            //   return;
+            // }
+            // Если возможа валидация данных в app.cofnig, то можно использовать тот же
+            // подход, что и с ParseArguments, т.е. возвращать false и выводить сообщение, что конфиг неправильный
+            // FolderSyncConfiguration configuration;
+            // if (!CreateSyncConfigurationAndPrintMessageIfSomethingWasWrong(parsesdArguments)) {
+            //   return;
+            // }
+            // 
+            // if (!TrySync(configuration)) {
+            //   return -1;
+            //}
+            // 
+            // return 0; // Проверить, какой код возврата должен быть в случае успеха/неудачи! Я забыл, что должно быть когда!
+        }
+    }
+
+    // 1. Coupling - насколько сущности связанны друг с другом (внешние связи)
+    // 2. Cohesion - насколько сущность является цельной
+
+    // У нас есть тип аргумента! Давай его добавим
+
+    public enum ArgumentKind
+    {
+        Boolean,
+        String,
+        Number,
+    }
+
+    public class Argument
+    {
+        private string _stringValue;
+        private int _intValue;
+
+        // Только свойства, не поля.
+        // Почему: вполне возможно, что нам понадобится добавить дополнительное поведение
+        // Сделать объект "неизменяемым", т.е. добавить конструкор, который будет инициализировать нужное состояние
+
+        private Argument(string name, string description, ArgumentKind kind)
+        {
+            Name = name;
+            Description = description;
+            Kind = kind;
+        }
+
+        /// <summary>
+        /// Name of the argument (without '-' or '/').
+        /// </summary>
+        public string Name { get; }
+
+        public string Description { get; }
+
+        public ArgumentKind Kind { get; }
+
+        public string StringValue
+        {
+            get
+            {
+                if (Kind != ArgumentKind.String)
+                {
+                    throw new InvalidOperationException($"You're doing something stupid! This argument is not a string kind, but '{Kind}'");
+                }
+
+                return _stringValue;
+            }
+        }
+
+        //public static Argument StringArgument(string name, string description, string value)
+        //{
+        //    return new Argument(name, description, ArgumentKind.String) {_stringValue = value};
+        //}
+
+        //public static Argument IntArgument(string name, string description, int value)
+        //{
+        //    return new Argument(name, description, ArgumentKind.String) {_intValue = value};
+        //}
+
+        //public static Argument FlagArgument(string name, string description, int value)
+        //{
+        //    return new Argument(name, description, ArgumentKind.String) {_intValue = value};
+        //}
+    }
+
+    // Класс дожлен быть существительным, метод - глаголом. Поэтому класс - парсер, метод - parse/read
+    public class ArgumentProcessor // если здесь останется PrintHelp, то это уже будет не парсер, а скорее processor
+    {
+        public static bool Parse(string[] args, out List<Argument> parsedArguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static void PrintHelp()
+        {
+            //
+        }
+
+        private static List<Argument> InitArguments()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class ParseArguments
     {
         public ParseArguments()
         {
@@ -13,6 +173,7 @@ namespace AzureFolderSync
         // Compare command line arguments with based parameters class
         public static Arguments[] ReadParams(string[] args, Arguments[] basedParams)
         {
+            // TODO: code is working, but I'm not proud of it! Fix it later.
             int argNumber = 0;
             bool valueIsFound = false;
 
